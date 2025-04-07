@@ -1,0 +1,594 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/reservations": {
+      "get": {
+        "operationId": "ReservationsController_getReservations",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Liste des réservations récupérée avec succès"
+          },
+          "400": {
+            "description": "Requête invalide"
+          },
+          "401": {
+            "description": "Non autorisé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Reservations"
+        ]
+      },
+      "post": {
+        "operationId": "ReservationsController_createReservation",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReservationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Réservation créée avec succès"
+          },
+          "400": {
+            "description": "Requête invalide"
+          },
+          "401": {
+            "description": "Non autorisé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Reservations"
+        ]
+      }
+    },
+    "/api/reservations/{id}": {
+      "get": {
+        "operationId": "ReservationsController_getReservation",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Réservation récupérée avec succès"
+          },
+          "400": {
+            "description": "Requête invalide"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "404": {
+            "description": "Réservation non trouvée"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Reservations"
+        ]
+      },
+      "put": {
+        "operationId": "ReservationsController_updateReservation",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateReservationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Réservation mise à jour avec succès"
+          },
+          "400": {
+            "description": "Requête invalide"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "404": {
+            "description": "Réservation non trouvée"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Reservations"
+        ]
+      },
+      "delete": {
+        "operationId": "ReservationsController_deleteReservation",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Réservation supprimée avec succès"
+          },
+          "400": {
+            "description": "Requête invalide"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "404": {
+            "description": "Réservation non trouvée"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Reservations"
+        ]
+      }
+    },
+    "/api/rooms": {
+      "get": {
+        "operationId": "RoomsController_getRooms",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Liste des salles récupérée avec succès"
+          },
+          "400": {
+            "description": "Requête invalide"
+          },
+          "401": {
+            "description": "Non autorisé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Rooms"
+        ]
+      },
+      "post": {
+        "operationId": "RoomsController_createRoom",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRoomDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Salle créée avec succès"
+          },
+          "400": {
+            "description": "Requête invalide"
+          },
+          "401": {
+            "description": "Non autorisé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Rooms"
+        ]
+      }
+    },
+    "/api/rooms/{id}": {
+      "get": {
+        "operationId": "RoomsController_getRoom",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Salle récupérée avec succès"
+          },
+          "400": {
+            "description": "Requête invalide"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "404": {
+            "description": "Salle non trouvée"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Rooms"
+        ]
+      },
+      "put": {
+        "operationId": "RoomsController_updateRoom",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRoomDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Salle mise à jour avec succès"
+          },
+          "400": {
+            "description": "Requête invalide"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "404": {
+            "description": "Salle non trouvée"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Rooms"
+        ]
+      },
+      "delete": {
+        "operationId": "RoomsController_deleteRoom",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Salle supprimée avec succès"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "404": {
+            "description": "Salle non trouvée"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Rooms"
+        ]
+      }
+    },
+    "/api/users": {
+      "get": {
+        "operationId": "UsersController_getUsers",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Liste des utilisateurs récupérée avec succès"
+          },
+          "400": {
+            "description": "Requête invalide"
+          },
+          "401": {
+            "description": "Non autorisé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "operationId": "UsersController_getUser",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Utilisateur récupéré avec succès"
+          },
+          "400": {
+            "description": "Requête invalide"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "404": {
+            "description": "Utilisateur non trouvé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/users/{id}/extract": {
+      "post": {
+        "operationId": "UsersController_extractReservations",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Extraction des réservations effectuée avec succès"
+          },
+          "400": {
+            "description": "Requête invalide"
+          },
+          "401": {
+            "description": "Non autorisé"
+          },
+          "404": {
+            "description": "Utilisateur non trouvé"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/login": {
+      "post": {
+        "operationId": "AuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "example": {
+                  "email": "test@test.com",
+                  "password": "password"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token généré avec succès"
+          },
+          "400": {
+            "description": "Identifiants invalides"
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "Booking Platform",
+    "description": "API REST de réservation de salles",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "CreateReservationDto": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "number",
+            "example": 1
+          },
+          "room_id": {
+            "type": "number",
+            "example": 2
+          },
+          "start_time": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2025-03-20T10:00:00Z"
+          },
+          "end_time": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2025-03-20T12:00:00Z"
+          }
+        },
+        "required": [
+          "user_id",
+          "room_id",
+          "start_time",
+          "end_time"
+        ]
+      },
+      "UpdateReservationDto": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "number",
+            "example": 1
+          },
+          "room_id": {
+            "type": "number",
+            "example": 2
+          },
+          "start_time": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2025-03-20T10:00:00Z"
+          },
+          "end_time": {
+            "format": "date-time",
+            "type": "string",
+            "example": "2025-03-20T12:00:00Z"
+          }
+        }
+      },
+      "CreateRoomDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Salle de réunion 101"
+          },
+          "capacity": {
+            "type": "number",
+            "example": 10
+          },
+          "location": {
+            "type": "string",
+            "example": "Paris - La Défense"
+          }
+        },
+        "required": [
+          "name",
+          "capacity"
+        ]
+      },
+      "UpdateRoomDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Salle de réunion 101"
+          },
+          "capacity": {
+            "type": "number",
+            "example": 10
+          },
+          "location": {
+            "type": "string",
+            "example": "Paris - La Défense"
+          }
+        }
+      }
+    }
+  }
+}

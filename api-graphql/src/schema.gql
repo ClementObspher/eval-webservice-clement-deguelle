@@ -1,0 +1,61 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  id: ID!
+  keycloak_id: String!
+  email: String!
+  created_at: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type AuthResponse {
+  accessToken: String!
+}
+
+type Reservation {
+  id: ID!
+  user_id: Float!
+  room_id: Float!
+  start_time: DateTime!
+  end_time: DateTime!
+  created_at: DateTime!
+}
+
+type Room {
+  id: ID!
+  name: String!
+  capacity: Float!
+  location: String
+  created_at: DateTime!
+}
+
+type Query {
+  listRooms(skip: Float, limit: Float): [Room!]!
+  room(id: ID!): Room
+  listReservations(skip: Float, limit: Float): [Reservation!]!
+  reservation(id: ID!): Reservation
+  listUsers(skip: Float, limit: Float): [User!]!
+  user(id: ID!): User
+  whoAmI: User!
+}
+
+type Mutation {
+  createRoom(name: String!, capacity: Float!, location: String): Room!
+  updateRoom(id: ID!, name: String, capacity: Float, location: String): Room!
+  deleteRoom(id: ID!): Boolean!
+  createReservation(userId: String!, roomId: String!, startTime: DateTime!, endTime: DateTime!): Reservation!
+  updateReservation(id: ID!, userId: String, roomId: String, startTime: DateTime, endTime: DateTime): Reservation!
+  deleteReservation(id: ID!): Boolean!
+  login(input: LoginInput!): AuthResponse!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}

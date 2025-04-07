@@ -1,0 +1,26 @@
+{
+  "openapi": "3.0.0",
+  "paths": {},
+  "info": {
+    "title": "Students API",
+    "description": "The students API description",
+    "version": "1.0.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [
+    {
+      "url": "http://localhost:3000"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {}
+  }
+}
