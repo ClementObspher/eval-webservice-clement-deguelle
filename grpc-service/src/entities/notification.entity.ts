@@ -2,7 +2,7 @@ import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity('notifications')
 export class NotificationEntity {
-  @PrimaryColumn()
+  @PrimaryColumn({ type: 'uuid' })
   id: string;
 
   @Column()
