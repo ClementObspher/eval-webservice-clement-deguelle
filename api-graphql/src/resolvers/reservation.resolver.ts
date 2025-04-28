@@ -1,5 +1,6 @@
-import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, ID, Int } from '@nestjs/graphql';
 import { Reservation } from '../entities/reservation.entity';
+import { Notification } from '../entities/notification.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { GqlAuthGuard } from '../auth/gql-auth.guard';
@@ -10,13 +11,15 @@ export class ReservationResolver {
   constructor(
     @InjectRepository(Reservation)
     private reservationRepository: Repository<Reservation>,
+    @InjectRepository(Notification)
+    private notificationRepository: Repository<Notification>,
   ) {}
 
   @Query(() => [Reservation])
   @UseGuards(GqlAuthGuard)
   async listReservations(
-    @Args('skip', { nullable: true }) skip?: number,
-    @Args('limit', { nullable: true }) limit?: number,
+    @Args('skip', { nullable: true, type: () => Int }) skip?: number,
+    @Args('limit', { nullable: true, type: () => Int }) limit?: number,
   ) {
     return this.reservationRepository.find({
       skip,
@@ -33,28 +36,38 @@ export class ReservationResolver {
   @Mutation(() => Reservation)
   @UseGuards(GqlAuthGuard)
   async createReservation(
-    @Args('userId') userId: string,
-    @Args('roomId') roomId: string,
-    @Args('startTime') startTime: Date,
-    @Args('endTime') endTime: Date,
+    @Args('user_id', { type: () => Int }) userId: number,
+    @Args('room_id', { type: () => Int }) roomId: number,
+    @Args('start_time') startTime: Date,
+    @Args('end_time') endTime: Date,
   ) {
     const reservation = this.reservationRepository.create({
-      user_id: parseInt(userId),
-      room_id: parseInt(roomId),
+      user_id: userId,
+      room_id: roomId,
       start_time: startTime,
       end_time: endTime,
     });
-    return this.reservationRepository.save(reservation);
+    const savedReservation = await this.reservationRepository.save(reservation);
+
+    // Créer une notification pour la nouvelle réservation
+    const notification = this.notificationRepository.create({
+      reservation_id: savedReservation.id,
+      message: `Nouvelle réservation créée pour l'utilisateur ${userId} dans la salle ${roomId}`,
+      notificationDate: new Date(),
+    });
+    await this.notificationRepository.save(notification);
+
+    return savedReservation;
   }
 
   @Mutation(() => Reservation)
   @UseGuards(GqlAuthGuard)
   async updateReservation(
     @Args('id', { type: () => ID }) id: string,
-    @Args('userId', { nullable: true }) userId?: string,
-    @Args('roomId', { nullable: true }) roomId?: string,
-    @Args('startTime', { nullable: true }) startTime?: Date,
-    @Args('endTime', { nullable: true }) endTime?: Date,
+    @Args('user_id', { type: () => Int, nullable: true }) userId?: number,
+    @Args('room_id', { type: () => Int, nullable: true }) roomId?: number,
+    @Args('start_time', { nullable: true }) startTime?: Date,
+    @Args('end_time', { nullable: true }) endTime?: Date,
   ) {
     const reservation = await this.reservationRepository.findOne({
       where: { id: parseInt(id) },
@@ -63,8 +76,8 @@ export class ReservationResolver {
       throw new Error('Reservation not found');
     }
 
-    if (userId) reservation.user_id = parseInt(userId);
-    if (roomId) reservation.room_id = parseInt(roomId);
+    if (userId) reservation.user_id = userId;
+    if (roomId) reservation.room_id = roomId;
     if (startTime) reservation.start_time = startTime;
     if (endTime) reservation.end_time = endTime;
 

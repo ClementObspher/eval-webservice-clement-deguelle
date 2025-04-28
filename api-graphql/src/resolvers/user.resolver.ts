@@ -1,4 +1,4 @@
-import { Resolver, Query, Args, ID } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
 import { User } from '../entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -28,5 +28,18 @@ export class UserResolver {
   @UseGuards(GqlAuthGuard)
   async user(@Args('id', { type: () => ID }) id: string) {
     return this.userRepository.findOne({ where: { id: parseInt(id) } });
+  }
+
+  @Mutation(() => User)
+  @UseGuards(GqlAuthGuard)
+  async createUser(
+    @Args('email') email: string,
+    @Args('keycloak_id') keycloakId: string,
+  ) {
+    const user = this.userRepository.create({
+      email,
+      keycloak_id: keycloakId,
+    });
+    return this.userRepository.save(user);
   }
 }

@@ -8,6 +8,7 @@ describe("Reservations E2E Tests", () => {
 	let token
 	let createdRoomId
 	let userId
+	let createdReservationId
 
 	beforeAll(async () => {
 		token = getToken()
@@ -23,12 +24,14 @@ describe("Reservations E2E Tests", () => {
 			base_url: process.env.API_REST_URL,
 			token,
 		})
+		if (!usersRes.data.users || usersRes.data.users.length === 0) {
+			throw new Error("No users found in the system")
+		}
 		userId = usersRes.data.users[0].id
 	})
 
 	it("should create a reservation using the created room", async () => {
-		// Exemple d'utilisation
-		const reservationRes = await axios.post(
+		const response = await axios.post(
 			`${process.env.API_REST_URL}/api/reservations`,
 			{
 				user_id: userId,
@@ -69,7 +72,7 @@ describe("Reservations E2E Tests", () => {
 	})
 
 	it("should get the created reservation by ID", async () => {
-		const response = await axios.get(`${BASE_URL}/api/reservations/${createdReservationId}`, {
+		const response = await axios.get(`${process.env.API_REST_URL}/api/reservations/${createdReservationId}`, {
 			headers: {
 				Authorization: `Bearer ${token}`,
 			},
@@ -83,7 +86,7 @@ describe("Reservations E2E Tests", () => {
 
 	it("should update the reservation times and status", async () => {
 		const response = await axios.put(
-			`${BASE_URL}/api/reservations/${createdReservationId}`,
+			`${process.env.API_REST_URL}/api/reservations/${createdReservationId}`,
 			{
 				start_time: "2025-06-01T10:00:00Z",
 				end_time: "2025-06-01T12:00:00Z",
@@ -111,8 +114,8 @@ describe("Reservations E2E Tests", () => {
 	})
 
 	it("should list reservations (with pagination)", async () => {
-		// On utilise skip=0 / limit=10 à titre d’exemple
-		const response = await axios.get(`${BASE_URL}/api/reservations?skip=0&limit=10`, {
+		// On utilise skip=0 / limit=10 à titre d'exemple
+		const response = await axios.get(`${process.env.API_REST_URL}/api/reservations?skip=0&limit=10`, {
 			headers: {
 				Authorization: `Bearer ${token}`,
 			},
@@ -121,14 +124,14 @@ describe("Reservations E2E Tests", () => {
 		expect(response.status).toBe(200)
 		expect(Array.isArray(response.data.reservations)).toBe(true)
 
-		// Optionnel : vérifier si la réservation qu’on vient de créer est dans la liste
+		// Optionnel : vérifier si la réservation qu'on vient de créer est dans la liste
 		// par exemple en cherchant son ID
 		const found = response.data.reservations.some((r) => r.id === createdReservationId)
 		expect(found).toBe(true)
 	})
 
 	it("should extract as csv and get the url of the file", async () => {
-		const response = await axios.get(`${BASE_URL}/api/users/${userId}/extract`, {
+		const response = await axios.get(`${process.env.API_REST_URL}/api/users/${userId}/extract`, {
 			headers: {
 				Authorization: `Bearer ${token}`,
 			},
@@ -163,7 +166,7 @@ describe("Reservations E2E Tests", () => {
 	})
 
 	it("should delete the created reservation", async () => {
-		const response = await axios.delete(`${BASE_URL}/api/reservations/${createdReservationId}`, {
+		const response = await axios.delete(`${process.env.API_REST_URL}/api/reservations/${createdReservationId}`, {
 			headers: {
 				Authorization: `Bearer ${token}`,
 			},
@@ -174,14 +177,14 @@ describe("Reservations E2E Tests", () => {
 
 	it("should verify the reservation is deleted", async () => {
 		try {
-			await axios.get(`${BASE_URL}/api/reservations/${createdReservationId}`, {
+			await axios.get(`${process.env.API_REST_URL}/api/reservations/${createdReservationId}`, {
 				headers: {
 					Authorization: `Bearer ${token}`,
 				},
 			})
 			throw new Error("Reservation was not deleted properly")
 		} catch (error) {
-			// L'API devrait renvoyer une 404 si la ressource n’existe plus
+			// L'API devrait renvoyer une 404 si la ressource n'existe plus
 			expect(error.response.status).toBe(404)
 		}
 	})

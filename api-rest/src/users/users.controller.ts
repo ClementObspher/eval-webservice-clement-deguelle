@@ -21,12 +21,7 @@ export class UsersController {
     @ApiBadRequestResponse({ description: 'Requête invalide' })
     @ApiUnauthorizedResponse({ description: 'Non autorisé' })
     async getUsers(@Query('skip') skip = 0, @Query('limit') limit = 10) {
-        const users = await this.usersService.findAll(skip, limit)
-        return {
-            data: users,
-            statusCode: HttpStatus.OK,
-            message: 'Users fetched successfully',
-        }
+        return await this.usersService.findAll(skip, limit)
     }
 
     @Get(':id')
@@ -35,13 +30,21 @@ export class UsersController {
     @ApiBadRequestResponse({ description: 'Requête invalide' })
     @ApiNotFoundResponse({ description: 'Utilisateur non trouvé' })
     @ApiUnauthorizedResponse({ description: 'Non autorisé' })
-    async getUser(@Param('id') id: number) {
-        const user = await this.usersService.findOne(id)
+    async getUser(@Param('id') id: string) {
+        const userId = parseInt(id, 10)
+        if (isNaN(userId)) {
+            return {
+                data: null,
+                statusCode: HttpStatus.BAD_REQUEST,
+                message: 'Invalid user ID format',
+            }
+        }
+        const user = await this.usersService.findOne(userId)
         if (!user) {
             return {
                 data: null,
                 statusCode: HttpStatus.NOT_FOUND,
-                message: `User ${id} not found`,
+                message: `User ${userId} not found`,
             }
         }
         return {

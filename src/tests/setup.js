@@ -1,4 +1,4 @@
-// tests/setupKeycloak.js
+require("dotenv").config()
 const request = require("supertest")
 
 let keycloakAccessToken = ""

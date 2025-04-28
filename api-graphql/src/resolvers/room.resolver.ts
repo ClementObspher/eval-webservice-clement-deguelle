@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, ID, Int } from '@nestjs/graphql';
 import { Room } from '../entities/room.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -15,13 +15,21 @@ export class RoomResolver {
   @Query(() => [Room])
   @UseGuards(GqlAuthGuard)
   async listRooms(
-    @Args('skip', { nullable: true }) skip?: number,
-    @Args('limit', { nullable: true }) limit?: number,
+    @Args('skip', { type: () => Int, nullable: true }) skip?: number,
+    @Args('limit', { type: () => Int, nullable: true }) limit?: number,
   ) {
-    return this.roomRepository.find({
+    const rooms = await this.roomRepository.find({
       skip,
       take: limit,
+      order: {
+        id: 'DESC',
+      },
     });
+
+    return rooms.map((room) => ({
+      ...room,
+      id: room.id.toString(),
+    }));
   }
 
   @Query(() => Room, { nullable: true })
@@ -34,7 +42,7 @@ export class RoomResolver {
   @UseGuards(GqlAuthGuard)
   async createRoom(
     @Args('name') name: string,
-    @Args('capacity') capacity: number,
+    @Args('capacity', { type: () => Int }) capacity: number,
     @Args('location', { nullable: true }) location?: string,
   ) {
     const room = this.roomRepository.create({
@@ -50,7 +58,7 @@ export class RoomResolver {
   async updateRoom(
     @Args('id', { type: () => ID }) id: string,
     @Args('name', { nullable: true }) name?: string,
-    @Args('capacity', { nullable: true }) capacity?: number,
+    @Args('capacity', { type: () => Int, nullable: true }) capacity?: number,
     @Args('location', { nullable: true }) location?: string,
   ) {
     const room = await this.roomRepository.findOne({
@@ -70,7 +78,7 @@ export class RoomResolver {
   @Mutation(() => Boolean)
   @UseGuards(GqlAuthGuard)
   async deleteRoom(@Args('id', { type: () => ID }) id: string) {
-    const result = await this.roomRepository.delete(id);
+    const result = await this.roomRepository.delete(parseInt(id));
     return (result.affected ?? 0) > 0;
   }
 }
