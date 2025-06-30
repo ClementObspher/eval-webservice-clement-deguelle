@@ -44,16 +44,17 @@ async function getAdminAccessToken() {
 }
 
 async function cleanupTables() {
-    console.log('=== Truncating tables ===');
+    //console.log('=== Truncating tables ===');
     // Attention à l’ordre si vous avez des clés étrangères
-    await pool.query('TRUNCATE TABLE notifications RESTART IDENTITY CASCADE;');
-    await pool.query('TRUNCATE TABLE reservations RESTART IDENTITY CASCADE;');
-    await pool.query('TRUNCATE TABLE rooms RESTART IDENTITY CASCADE;');
-    await pool.query('TRUNCATE TABLE "users" RESTART IDENTITY CASCADE;');
+// Utilisation :
+    await safeTruncate(pool, 'notifications');
+    await safeTruncate(pool, 'reservations');
+    await safeTruncate(pool, 'rooms');
+    await safeTruncate(pool, 'users');
 }
 
 async function fetchAndInsertKeycloakUsers(adminToken) {
-    console.log('=== Fetching users from Keycloak ===');
+    //console.log('=== Fetching users from Keycloak ===');
     const url = `${KEYCLOAK_URL}/admin/realms/${KEYCLOAK_REALM}/users?max=1000`;
 
     const res = await axios.get(url, {
@@ -63,7 +64,7 @@ async function fetchAndInsertKeycloakUsers(adminToken) {
     });
 
     const keycloakUsers = res.data; // Liste d'utilisateurs
-    console.log(`Found ${keycloakUsers.length} users in Keycloak.`);
+    //console.log(`Found ${keycloakUsers.length} users in Keycloak.`);
 
     for (const user of keycloakUsers) {
         const keycloakId = user.id; // champ "id" côté Keycloak
@@ -74,7 +75,7 @@ async function fetchAndInsertKeycloakUsers(adminToken) {
         await pool.query(
             `INSERT INTO "users" ("keycloak_id", email, "created_at", "updated_at")
        VALUES ($1, $2, NOW(), NOW())
-       ON CONFLICT ("keycloakId") DO NOTHING;`,
+       ON CONFLICT ("keycloak_id") DO NOTHING;`,
             [keycloakId, email]
         );
     }
@@ -91,7 +92,7 @@ async function main() {
         // 3) Récupérer la liste des users Keycloak et insérer dans DB
         await fetchAndInsertKeycloakUsers(adminToken);
 
-        console.log('=== Cleanup & Keycloak user sync completed ===');
+        //console.log('=== Cleanup & Keycloak user sync completed ===');
     } catch (err) {
         console.error('Error in cleanupDB script:', err);
     } finally {
@@ -99,9 +100,21 @@ async function main() {
     }
 }
 
-// Lancer le script si exécuté directement
-if (require.main === module) {
-    main();
+async function safeTruncate(pool, tableName) {
+    await pool.query(`
+    DO $$
+    BEGIN
+      IF EXISTS (SELECT FROM information_schema.tables WHERE table_schema = 'public' AND table_name = '${tableName}') THEN
+        EXECUTE 'TRUNCATE TABLE "${tableName}" RESTART IDENTITY CASCADE';
+      END IF;
+    END
+    $$;
+  `);
 }
 
+
+beforeAll(async () => {
+    //console.log('=== Starting cleanupDB script ===');
+    await main();
+}, 10000); // Timeout de 10 secondes pour le beforeAll
 module.exports = { main };

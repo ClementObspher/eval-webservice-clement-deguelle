@@ -1,8 +1,9 @@
 const axios = require('axios');
-const {getToken} = require('../setup');
+const {getUsrToken} = require('../setup');
 const {createRoom, defaultRoom} = require("../utils/room.utils");
 const {getUsers} = require("../utils/user.utils");
-const {getPool, closePool} = require("../utils/db.utils");const { Readable } = require('stream');
+const {getPool, closePool} = require("../utils/db.utils");
+const { Readable } = require('stream');
   const csv = require('csv-parser');
 
 
@@ -14,7 +15,7 @@ describe('Reservations E2E Tests', () => {
   let userId;
 
   beforeAll(async () => {
-    token = getToken();
+    token = getUsrToken();
 
     const roomRes = await createRoom({
       base_url: process.env.API_REST_URL,
@@ -66,8 +67,8 @@ describe('Reservations E2E Tests', () => {
     )
     expect(rows).toBeDefined()
     expect(rows.length).toBe(1);
-    expect(rows[0].userId).toBe(userId);
-    expect(rows[0].roomId).toBe(createdRoomId);
+    expect(rows[0].user_id).toBe(userId);
+    expect(rows[0].room_id).toBe(createdRoomId);
     await closePool();
   });
 
@@ -76,7 +77,7 @@ describe('Reservations E2E Tests', () => {
     const {rows} = await pool.query(
       `SELECT *
        FROM notifications
-       WHERE "reservationId" = $1`,
+       WHERE "reservation_id" = $1`,
       [createdReservationId]
     );
 
@@ -114,11 +115,10 @@ describe('Reservations E2E Tests', () => {
         }
       }
     );
-
     expect(response.status).toBe(200);
     expect(response.data.id).toBe(createdReservationId);
-    expect(response.data.startTime).toMatch(/2025-06-02T10:00:00.000Z/);
-    expect(response.data.endTime).toMatch(/2025-06-02T12:00:00.000Z/);
+    expect(response.data.startTime).toMatch("2025-06-02T10:00:00.000Z");
+    expect(response.data.endTime).toMatch("2025-06-02T12:00:00.000Z");
     expect(response.data.status).toBe('approved');
   });
 
@@ -128,7 +128,7 @@ describe('Reservations E2E Tests', () => {
     const {rows} = await pool.query(
       `SELECT *
        FROM notifications
-       WHERE "reservationId" = $1`,
+       WHERE "reservation_id" = $1`,
       [createdReservationId]
     );
     expect(rows).toBeDefined()
@@ -148,11 +148,11 @@ describe('Reservations E2E Tests', () => {
     );
 
     expect(response.status).toBe(200);
-    expect(Array.isArray(response.data.reservations)).toBe(true);
+    expect(Array.isArray(response.data)).toBe(true);
 
     // Optionnel : vérifier si la réservation qu’on vient de créer est dans la liste
     // par exemple en cherchant son ID
-    const found = response.data.reservations.some(
+    const found = response.data.some(
       (r) => r.id === createdReservationId
     );
     expect(found).toBe(true);
@@ -175,10 +175,11 @@ describe('Reservations E2E Tests', () => {
       const url = response.data.url;
       //get the file
 
-      console.log('response.data',response.data);
-      console.log('url', url);
+
+      //console.log('response.data',response.data);
+      //console.log('url', url);
       const file = await axios.get(url);
-      console.log(file.status);
+      //console.log(file.status);
       expect(file.status).toBe(200);
 
       const fileStream = new Readable();
@@ -189,7 +190,7 @@ describe('Reservations E2E Tests', () => {
       fileStream.pipe(csv())
         .on('data', (data) => results.push(data))
         .on('end', () => {
-          console.log(results);
+          //console.log(results);
           // Vérifiez le contenu du fichier CSV
           expect(results.length).toBeGreaterThan(0);
           expect(results[0]).toHaveProperty('reservationId');
@@ -200,7 +201,7 @@ describe('Reservations E2E Tests', () => {
           expect(results[0]).toHaveProperty('status');
         });
     } catch (err) {
-      console.log(err);
+      // //console.log(err);
       throw err;
     }
   });
