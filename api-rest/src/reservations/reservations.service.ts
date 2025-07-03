@@ -61,21 +61,11 @@ export class ReservationsService {
             throw new Error('Failed to create reservation: no ID returned')
         }
 
-        console.log('Sending notification data:', {
-            reservation_id: savedReservation.id,
-            message: `Nouvelle réservation créée pour l'utilisateur ${data.user_id} dans la salle ${data.room_id}`,
-            notificationDate: new Date().toISOString(),
-        })
-
         const notificationData = {
-            reservation_id: savedReservation.id,
+            reservationId: savedReservation.id,
             message: `Nouvelle réservation créée pour l'utilisateur ${data.user_id} dans la salle ${data.room_id}`,
             notificationDate: new Date().toISOString(),
         }
-
-        console.log('Notification data to send:', notificationData)
-        console.log('reservation_id type:', typeof notificationData.reservation_id)
-        console.log('reservation_id value:', notificationData.reservation_id)
 
         try {
             await this.notificationService.createNotification(notificationData).toPromise()
@@ -104,12 +94,18 @@ export class ReservationsService {
         }
         const updatedReservation = await this.reservationsRepository.save(reservationData)
 
-        // Créer une notification pour la mise à jour
-        await this.reservationsRepository.query(
-            `INSERT INTO notifications (id, reservation_id, message, notification_date) 
-             VALUES (gen_random_uuid(), $1, $2, $3)`,
-            [id, `Réservation ${id} mise à jour`, new Date()],
-        )
+        // Créer une notification pour la mise à jour via gRPC
+        const notificationData = {
+            reservationId: id,
+            message: `Réservation ${id} mise à jour`,
+            notificationDate: new Date().toISOString(),
+        }
+
+        try {
+            await this.notificationService.createNotification(notificationData).toPromise()
+        } catch (error) {
+            console.log('Erreur lors de la création de notification gRPC pour mise à jour:', error.message)
+        }
 
         return updatedReservation
     }

@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, CreateDateColumn } from 'typeorm'
+import { Entity, Column, PrimaryColumn } from 'typeorm'
 import { ObjectType, Field, ID } from '@nestjs/graphql'
 
 @ObjectType()
@@ -19,8 +19,4 @@ export class Notification {
     @Field()
     @Column({ type: 'timestamp', nullable: false })
     notification_date: Date
-
-    @Field()
-    @CreateDateColumn()
-    created_at: Date
 }
