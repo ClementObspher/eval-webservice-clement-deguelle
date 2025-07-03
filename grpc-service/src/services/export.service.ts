@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { Client } from 'minio';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Reservation } from '../entities/reservation.entity';
 import {
   ExportReservationsDto,
   ExportReservationsResponse,
@@ -10,7 +13,10 @@ import { stringify } from 'csv-stringify/sync';
 export class ExportService {
   private minioClient: Client;
 
-  constructor() {
+  constructor(
+    @InjectRepository(Reservation)
+    private reservationRepository: Repository<Reservation>,
+  ) {
     this.minioClient = new Client({
       endPoint: process.env.MINIO_ENDPOINT || 'localhost',
       port: parseInt(process.env.MINIO_PORT || '9000'),
@@ -24,19 +30,37 @@ export class ExportService {
     data: ExportReservationsDto,
   ): Promise<ExportReservationsResponse> {
     try {
-      // Simuler la récupération des réservations (à remplacer par votre logique réelle)
-      const reservations = [
-        { id: 1, userId: data.userId, status: 'pending' },
-        { id: 2, userId: data.userId, status: 'approved' },
-      ];
+      // S'assurer que le bucket existe
+      const bucketName = 'reservations';
+      const bucketExists = await this.minioClient.bucketExists(bucketName);
+      if (!bucketExists) {
+        await this.minioClient.makeBucket(bucketName);
+      }
+
+      // Récupérer les vraies réservations depuis la base de données
+      const reservations = await this.reservationRepository.find({
+        where: { user_id: data.userId },
+      });
 
       // Convertir en CSV
-      const csvContent = stringify(reservations, {
+      const csvData = reservations.map((reservation) => ({
+        reservationId: reservation.id,
+        userId: reservation.user_id,
+        roomId: reservation.room_id,
+        startTime: reservation.start_time,
+        endTime: reservation.end_time,
+        status: reservation.status,
+      }));
+
+      const csvContent = stringify(csvData, {
         header: true,
         columns: {
-          id: 'ID',
-          userId: 'User ID',
-          status: 'Status',
+          reservationId: 'reservationId',
+          userId: 'userId',
+          roomId: 'roomId',
+          startTime: 'startTime',
+          endTime: 'endTime',
+          status: 'status',
         },
       });
 

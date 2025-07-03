@@ -16,6 +16,9 @@ import { CsvExportService } from './common/csv-export.service'
 import { MinioService } from './common/miniio.service'
 import { AuthController } from './auth/auth.controller'
 import { AuthService } from './auth/auth.service'
+import { ClientsModule, Transport } from '@nestjs/microservices'
+import { NOTIFICATION_PACKAGE } from './common/constants'
+import { join } from 'path'
 
 @Module({
     imports: [
@@ -33,6 +36,17 @@ import { AuthService } from './auth/auth.service'
         TypeOrmModule.forFeature([Reservation, Room, User]),
         AuthModule,
         PassportModule,
+        ClientsModule.register([
+            {
+                name: NOTIFICATION_PACKAGE,
+                transport: Transport.GRPC,
+                options: {
+                    url: 'localhost:50051',
+                    package: 'notification',
+                    protoPath: join(__dirname, '../../grpc-service/src/proto/notification.proto'),
+                },
+            },
+        ]),
     ],
     controllers: [ReservationsController, RoomsController, UsersController, AuthController],
     providers: [ReservationsService, RoomsService, UsersService, JwtService, CsvExportService, AuthService, MinioService],

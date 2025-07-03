@@ -16,11 +16,14 @@ export class Reservation {
   @Column()
   room_id: number;
 
-  @Column()
+  @Column({ type: 'timestamp without time zone' })
   start_time: Date;
 
-  @Column()
+  @Column({ type: 'timestamp without time zone' })
   end_time: Date;
+
+  @Column({ default: 'pending' })
+  status: string;
 
   @CreateDateColumn()
   created_at: Date;

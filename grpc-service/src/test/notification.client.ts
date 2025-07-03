@@ -23,7 +23,7 @@ const client = new notificationService(
 // Test de création d'une notification
 const createNotification = () => {
   const notification = {
-    reservationId: 1,
+    reservation_id: 1,
     message: 'Test notification',
     notificationDate: new Date().toISOString(),
   };

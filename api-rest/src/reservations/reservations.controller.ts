@@ -27,11 +27,7 @@ export class ReservationsController {
     @ApiUnauthorizedResponse({ description: 'Non autorisé' })
     async getReservations(@Query('skip') skip = 0, @Query('limit') limit = 10) {
         const reservations = await this.reservationsService.findAll(skip, limit)
-        return {
-            reservations: reservations,
-            statusCode: HttpStatus.OK,
-            message: 'Reservations fetched successfully',
-        }
+        return reservations
     }
 
     @Get(':id')
@@ -45,7 +41,13 @@ export class ReservationsController {
         if (!reservation) {
             throw new NotFoundException(`Reservation ${id} not found`)
         }
-        return reservation
+        return {
+            id: reservation.id,
+            user: { id: reservation.user_id },
+            room: { id: reservation.room_id },
+            startTime: reservation.start_time,
+            endTime: reservation.end_time,
+        }
     }
 
     @Post()
@@ -55,7 +57,14 @@ export class ReservationsController {
     @ApiUnauthorizedResponse({ description: 'Non autorisé' })
     async createReservation(@Body() body: CreateReservationDto) {
         const reservationCreated = await this.reservationsService.create(body)
-        return reservationCreated
+        return {
+            id: reservationCreated.id,
+            user: { id: reservationCreated.user_id },
+            room: { id: reservationCreated.room_id },
+            startTime: reservationCreated.start_time,
+            endTime: reservationCreated.end_time,
+            status: reservationCreated.status,
+        }
     }
 
     @Put(':id')
@@ -65,12 +74,24 @@ export class ReservationsController {
     @ApiNotFoundResponse({ description: 'Réservation non trouvée' })
     @ApiUnauthorizedResponse({ description: 'Non autorisé' })
     async updateReservation(@Param('id') id: number, @Body() body: UpdateReservationDto) {
+        console.log('Body reçu dans updateReservation:', body)
+        // Compatibilité tests : mappe camelCase vers snake_case si besoin
+        if (body.startTime && !body.start_time) body.start_time = body.startTime
+        if (body.endTime && !body.end_time) body.end_time = body.endTime
+
         const reservation = await this.reservationsService.findOne(id)
         if (!reservation) {
             throw new NotFoundException(`Reservation ${id} not found`)
         }
         const reservationUpdated = await this.reservationsService.update(id, body)
-        return reservationUpdated
+        return {
+            id: reservationUpdated.id,
+            user: { id: reservationUpdated.user_id },
+            room: { id: reservationUpdated.room_id },
+            startTime: new Date(reservationUpdated.start_time).toISOString(),
+            endTime: new Date(reservationUpdated.end_time).toISOString(),
+            status: reservationUpdated.status,
+        }
     }
 
     @Delete(':id')

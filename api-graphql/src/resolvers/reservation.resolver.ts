@@ -34,25 +34,26 @@ export class ReservationResolver {
     @Mutation(() => Reservation)
     @UseGuards(GqlAuthGuard)
     async createReservation(
-        @Args('user_id', { type: () => Int }) userId: number,
-        @Args('room_id', { type: () => Int }) roomId: number,
-        @Args('start_time') startTime: Date,
-        @Args('end_time') endTime: Date,
+        @Args('user_id', { type: () => ID }) user_id: string,
+        @Args('room_id', { type: () => ID }) room_id: string,
+        @Args('start_time') start_time: Date,
+        @Args('end_time') end_time: Date,
     ) {
         const reservation = this.reservationRepository.create({
-            user_id: userId,
-            room_id: roomId,
-            start_time: startTime,
-            end_time: endTime,
+            user_id: parseInt(user_id),
+            room_id: parseInt(room_id),
+            start_time: start_time,
+            end_time: end_time,
+            status: 'pending',
         })
         const savedReservation = await this.reservationRepository.save(reservation)
 
         // Créer une notification pour la nouvelle réservation
         const notification = this.notificationRepository.create({
             id: uuidv4(),
-            reservationId: savedReservation.id,
-            message: `Nouvelle réservation créée pour l'utilisateur ${userId} dans la salle ${roomId}`,
-            notificationDate: new Date(),
+            reservation_id: savedReservation.id,
+            message: `Nouvelle réservation créée pour l'utilisateur ${user_id} dans la salle ${room_id}`,
+            notification_date: new Date(),
         })
         await this.notificationRepository.save(notification)
 
@@ -63,10 +64,10 @@ export class ReservationResolver {
     @UseGuards(GqlAuthGuard)
     async updateReservation(
         @Args('id', { type: () => ID }) id: string,
-        @Args('user_id', { type: () => Int, nullable: true }) userId?: number,
-        @Args('room_id', { type: () => Int, nullable: true }) roomId?: number,
-        @Args('start_time', { nullable: true }) startTime?: Date,
-        @Args('end_time', { nullable: true }) endTime?: Date,
+        @Args('user_id', { type: () => ID, nullable: true }) user_id?: string,
+        @Args('room_id', { type: () => ID, nullable: true }) room_id?: string,
+        @Args('start_time', { nullable: true }) start_time?: Date,
+        @Args('end_time', { nullable: true }) end_time?: Date,
     ) {
         const reservation = await this.reservationRepository.findOne({
             where: { id: parseInt(id) },
@@ -75,10 +76,10 @@ export class ReservationResolver {
             throw new Error('Reservation not found')
         }
 
-        if (userId) reservation.user_id = userId
-        if (roomId) reservation.room_id = roomId
-        if (startTime) reservation.start_time = startTime
-        if (endTime) reservation.end_time = endTime
+        if (user_id) reservation.user_id = parseInt(user_id)
+        if (room_id) reservation.room_id = parseInt(room_id)
+        if (start_time) reservation.start_time = start_time
+        if (end_time) reservation.end_time = end_time
 
         return this.reservationRepository.save(reservation)
     }

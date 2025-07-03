@@ -10,7 +10,7 @@ export class Notification {
 
     @Field()
     @Column({ nullable: false })
-    reservationId: number
+    reservation_id: number
 
     @Field()
     @Column()
@@ -18,7 +18,7 @@ export class Notification {
 
     @Field()
     @Column({ type: 'timestamp', nullable: false })
-    notificationDate: Date
+    notification_date: Date
 
     @Field()
     @CreateDateColumn()

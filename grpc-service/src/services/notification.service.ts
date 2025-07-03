@@ -15,21 +15,25 @@ export class NotificationService {
     private notificationRepository: Repository<NotificationEntity>,
   ) {}
 
-  async createNotification(
-    data: CreateNotificationDto,
-  ): Promise<NotificationEntity> {
+  async createNotification(data: any): Promise<NotificationEntity> {
+    // Support de la compatibilité camelCase/snake_case
+    const reservationId = data.reservationId || data.reservation_id;
+    const notificationDate = data.notificationDate || data.notification_date;
+
+    if (!reservationId) {
+      throw new Error('reservation_id is required');
+    }
+
     const notification = new NotificationEntity();
     notification.id = uuidv4();
-    notification.reservationId = data.reservationId;
+    notification.reservation_id = parseInt(reservationId);
     notification.message = data.message;
-    notification.notificationDate = data.notificationDate;
+    notification.notification_date = new Date(notificationDate);
 
     return await this.notificationRepository.save(notification);
   }
 
-  async updateNotification(
-    data: UpdateNotificationDto,
-  ): Promise<NotificationEntity> {
+  async updateNotification(data: any): Promise<NotificationEntity> {
     const notification = await this.notificationRepository.findOne({
       where: { id: data.id },
     });
@@ -38,8 +42,11 @@ export class NotificationService {
       throw new Error('Notification not found');
     }
 
+    // Support de la compatibilité camelCase/snake_case
+    const notificationDate = data.notificationDate || data.notification_date;
+
     notification.message = data.message;
-    notification.notificationDate = data.notificationDate;
+    notification.notification_date = new Date(notificationDate);
 
     return await this.notificationRepository.save(notification);
   }

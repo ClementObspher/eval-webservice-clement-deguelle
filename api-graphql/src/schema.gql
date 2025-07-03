@@ -7,6 +7,7 @@ type User {
   keycloak_id: String!
   email: String!
   created_at: DateTime!
+  updated_at: DateTime!
 }
 
 """
@@ -24,6 +25,7 @@ type Reservation {
   room_id: Float!
   start_time: DateTime!
   end_time: DateTime!
+  status: String!
   created_at: DateTime!
 }
 
@@ -49,8 +51,8 @@ type Mutation {
   createRoom(name: String!, capacity: Int!, location: String): Room!
   updateRoom(id: ID!, name: String, capacity: Int, location: String): Room!
   deleteRoom(id: ID!): Boolean!
-  createReservation(user_id: Int!, room_id: Int!, start_time: DateTime!, end_time: DateTime!): Reservation!
-  updateReservation(id: ID!, user_id: Int, room_id: Int, start_time: DateTime, end_time: DateTime): Reservation!
+  createReservation(user_id: ID!, room_id: ID!, start_time: DateTime!, end_time: DateTime!): Reservation!
+  updateReservation(id: ID!, user_id: ID, room_id: ID, start_time: DateTime, end_time: DateTime): Reservation!
   deleteReservation(id: ID!): Boolean!
   createUser(email: String!, keycloak_id: String!): User!
   login(input: LoginInput!): AuthResponse!

@@ -5,7 +5,7 @@ import axios from 'axios'
 export class AuthService {
     async loginWithKeycloak(email: string, password: string): Promise<string> {
         const KEYCLOAK_URL = 'http://localhost:8080'
-        const REALM = 'myrealm'
+        const REALM = 'reservation-realm'
         const CLIENT_ID = 'myclient'
         const CLIENT_SECRET = 'mysecret'
 

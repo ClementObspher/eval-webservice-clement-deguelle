@@ -1,9 +1,10 @@
 import { Controller, Get, Post, Put, Delete, Param, Body, Query, UseGuards, HttpStatus, NotFoundException } from '@nestjs/common'
 import { UsersService } from './users.service'
-import { ApiTags, ApiBearerAuth, ApiOkResponse, ApiBadRequestResponse, ApiUnauthorizedResponse, ApiNotFoundResponse } from '@nestjs/swagger'
+import { ApiTags, ApiBearerAuth, ApiOkResponse, ApiBadRequestResponse, ApiUnauthorizedResponse, ApiNotFoundResponse, ApiCreatedResponse } from '@nestjs/swagger'
 import { JwtAuthGuard } from 'src/auth/jwt/jwt.guard'
 import { ReservationsService } from 'src/reservations/reservations.service'
 import { CsvExportService } from 'src/common/csv-export.service'
+import { CreateUserDto } from 'src/dto/user.dto'
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -21,7 +22,12 @@ export class UsersController {
     @ApiBadRequestResponse({ description: 'Requête invalide' })
     @ApiUnauthorizedResponse({ description: 'Non autorisé' })
     async getUsers(@Query('skip') skip = 0, @Query('limit') limit = 10) {
-        return await this.usersService.findAll(skip, limit)
+        const res = await this.usersService.findAll(skip, limit)
+        return {
+            users: res,
+            statusCode: HttpStatus.OK,
+            message: 'Users fetched successfully',
+        }
     }
 
     @Get(':id')
@@ -33,37 +39,36 @@ export class UsersController {
     async getUser(@Param('id') id: string) {
         const userId = parseInt(id, 10)
         if (isNaN(userId)) {
-            return {
-                data: null,
-                statusCode: HttpStatus.BAD_REQUEST,
-                message: 'Invalid user ID format',
-            }
+            throw new NotFoundException('Invalid user ID format')
         }
         const user = await this.usersService.findOne(userId)
         if (!user) {
-            return {
-                data: null,
-                statusCode: HttpStatus.NOT_FOUND,
-                message: `User ${userId} not found`,
-            }
+            throw new NotFoundException(`User ${userId} not found`)
         }
         return {
-            data: user,
-            statusCode: HttpStatus.OK,
-            message: 'User fetched successfully',
+            id: user.id,
+            email: user.email,
+            keycloakId: user.keycloak_id,
+            createdAt: user.created_at,
+            updatedAt: user.updated_at,
         }
     }
 
-    // @Post()
-    // @UseGuards(JwtAuthGuard)
-    // createUser(@Body() body: UserDto) {
-    //     const userCreated = this.usersService.create(body)
-    //     return {
-    //         data: userCreated,
-    //         statusCode: HttpStatus.CREATED,
-    //         message: 'User created successfully',
-    //     }
-    // }
+    @Post()
+    @UseGuards(JwtAuthGuard)
+    @ApiCreatedResponse({ description: 'Utilisateur créé avec succès' })
+    @ApiBadRequestResponse({ description: 'Requête invalide' })
+    @ApiUnauthorizedResponse({ description: 'Non autorisé' })
+    async createUser(@Body() body: CreateUserDto) {
+        const userCreated = await this.usersService.create(body)
+        return {
+            id: userCreated.id,
+            email: userCreated.email,
+            keycloakId: userCreated.keycloak_id,
+            createdAt: userCreated.created_at,
+            updatedAt: userCreated.updated_at,
+        }
+    }
 
     // @Put(':id')
     // @UseGuards(JwtAuthGuard)

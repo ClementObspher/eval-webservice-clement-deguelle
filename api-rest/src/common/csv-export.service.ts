@@ -13,16 +13,17 @@ export class CsvExportService {
 
         // Générer le CSV (format Buffer)
         const records = reservations.map((r) => ({
-            id: r.id,
-            room_id: r.room_id,
-            start_time: r.start_time,
-            end_time: r.end_time,
-            created_at: r.created_at,
+            reservationId: r.id,
+            userId: r.userId,
+            roomId: r.roomId,
+            startTime: r.startTime,
+            endTime: r.endTime,
+            status: r.status,
         }))
 
         const csvContent = stringify(records, {
             header: true,
-            columns: ['id', 'room_id', 'start_time', 'end_time', 'created_at'],
+            columns: ['reservationId', 'userId', 'roomId', 'startTime', 'endTime', 'status'],
         })
 
         const buffer = Buffer.from(csvContent)

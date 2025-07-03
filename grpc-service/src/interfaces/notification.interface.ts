@@ -1,12 +1,12 @@
 export interface Notification {
   id: string;
-  reservationId: number;
+  reservation_id: number;
   message: string;
   notificationDate: string;
 }
 
 export interface CreateNotificationDto {
-  reservationId: number;
+  reservation_id: number;
   message: string;
   notificationDate: string;
 }

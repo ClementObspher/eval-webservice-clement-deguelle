@@ -6,11 +6,16 @@ export class NotificationEntity {
   id: string;
 
   @Column()
-  reservationId: number;
+  reservation_id: number;
 
   @Column()
   message: string;
 
-  @Column()
-  notificationDate: string;
+  @Column({ type: 'timestamp', nullable: false })
+  notification_date: Date;
+
+  // Getter pour la compatibilité avec les tests
+  get reservationId(): number {
+    return this.reservation_id;
+  }
 }

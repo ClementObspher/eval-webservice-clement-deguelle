@@ -20,7 +20,7 @@ import { NotificationEntity } from './entities/notification.entity';
       entities: [Reservation, Room, User, NotificationEntity],
       synchronize: true,
     }),
-    TypeOrmModule.forFeature([NotificationEntity]),
+    TypeOrmModule.forFeature([NotificationEntity, Reservation]),
   ],
   controllers: [NotificationController],
   providers: [NotificationService, ExportService],

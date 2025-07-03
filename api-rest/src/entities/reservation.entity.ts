@@ -1,27 +1,25 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm'
 
 @Entity('reservations')
 export class Reservation {
-  @PrimaryGeneratedColumn()
-  id: number;
+    @PrimaryGeneratedColumn()
+    id: number
 
-  @Column()
-  user_id: number;
+    @Column()
+    user_id: number
 
-  @Column()
-  room_id: number;
+    @Column()
+    room_id: number
 
-  @Column()
-  start_time: Date;
+    @Column({ type: 'timestamp without time zone' })
+    start_time: Date
 
-  @Column()
-  end_time: Date;
+    @Column({ type: 'timestamp without time zone' })
+    end_time: Date
 
-  @CreateDateColumn()
-  created_at: Date;
+    @Column({ default: 'pending' })
+    status: string
+
+    @CreateDateColumn()
+    created_at: Date
 }
