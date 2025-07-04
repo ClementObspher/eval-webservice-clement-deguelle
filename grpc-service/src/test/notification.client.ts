@@ -2,7 +2,7 @@ import * as grpc from '@grpc/grpc-js';
 import * as protoLoader from '@grpc/proto-loader';
 import { join } from 'path';
 
-const PROTO_PATH = join(__dirname, '..', 'proto', 'notification.proto');
+const PROTO_PATH = join(__dirname, '..', 'proto', 'service.proto');
 
 const packageDefinition = protoLoader.loadSync(PROTO_PATH, {
   keepCase: true,

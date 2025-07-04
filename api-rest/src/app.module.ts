@@ -43,7 +43,7 @@ import { join } from 'path'
                 options: {
                     url: 'localhost:50051',
                     package: 'notification',
-                    protoPath: join(__dirname, '../../grpc-service/src/proto/notification.proto'),
+                    protoPath: join(__dirname, '../../grpc-service/src/proto/service.proto'),
                 },
             },
         ]),
