@@ -44,9 +44,15 @@ export class ExportService {
       const fileName = `reservations-${data.userId}-${Date.now()}.csv`;
 
       // Upload vers MinIO
-      await this.minioClient.putObject('reservations', fileName, csvContent, {
-        'Content-Type': 'text/csv',
-      });
+      await this.minioClient.putObject(
+        'reservations', 
+        fileName, 
+        csvContent, 
+        csvContent.length,
+        {
+          'Content-Type': 'text/csv',
+        }
+      );
 
       // Générer l'URL de téléchargement
       const url = await this.minioClient.presignedGetObject(

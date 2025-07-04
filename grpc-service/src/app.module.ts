@@ -12,11 +12,11 @@ import { NotificationEntity } from './entities/notification.entity';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'pguser',
-      password: 'pgpass',
-      database: 'pgdb',
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT || '5432', 10),
+      username: process.env.DB_USER || 'pguser',
+      password: process.env.DB_PASS || 'pgpass',
+      database: process.env.DB_NAME || 'pgdb',
       entities: [Reservation, Room, User, NotificationEntity],
       synchronize: true,
     }),
