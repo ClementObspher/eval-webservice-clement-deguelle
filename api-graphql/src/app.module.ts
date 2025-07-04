@@ -16,17 +16,17 @@ import { UserResolver } from './resolvers/user.resolver';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'pguser',
-      password: 'pgpass',
-      database: 'pgdb',
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT || '5432', 10),
+      username: process.env.DB_USER || 'pguser',
+      password: process.env.DB_PASS || 'pgpass',
+      database: process.env.DB_NAME || 'pgdb',
       entities: [Room, Reservation, User, Notification],
       synchronize: true,
     }),
     TypeOrmModule.forFeature([Room, Reservation, User, Notification]),
     GraphQLModule.forRoot<ApolloDriverConfig>({
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      autoSchemaFile: join(process.cwd(), 'schema.gql'),
       driver: ApolloDriver,
     }),
     AuthModule,
