@@ -1,0 +1,61 @@
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    command: start-dev
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN_USERNAME}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+    ports:
+      - "8080:8080"
+
+  minio:
+    image: minio/minio
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"
+      - "9090:9090"
+    command: server /data --console-address ":9090"
+
+  test-api-rest:
+    build:
+      context: .
+      dockerfile: api-rest/Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - keycloak
+      - minio
+
+  test-api-graphql:
+    build:
+      context: .
+      dockerfile: api-graphql/Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - keycloak
+      - minio
+
+  test-grpc-service:
+    build:
+      context: .
+      dockerfile: grpc-service/Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      - db
+      - keycloak
+      - minio
