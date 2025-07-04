@@ -13,7 +13,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
                 cache: true,
                 rateLimit: true,
                 jwksRequestsPerMinute: 5,
-                jwksUri: 'http://localhost:8080/realms/reservation-realm/protocol/openid-connect/certs',
+                jwksUri: `${process.env.KEYCLOAK_URL || 'http://localhost:8080'}/realms/reservation-realm/protocol/openid-connect/certs`,
             }),
             algorithms: ['RS256'],
         })
