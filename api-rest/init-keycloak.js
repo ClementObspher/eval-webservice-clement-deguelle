@@ -8,26 +8,26 @@ const KcAdminClient = require('keycloak-admin').default
     const KEYCLOAK_URL = 'http://localhost:8080'
     const ADMIN_USERNAME = 'admin'
     const ADMIN_PASSWORD = 'admin'
-    const REALM_NAME = 'myrealm'
-    const CLIENT_ID = 'myclient'
-    const CLIENT_SECRET = 'mysecret'
+    const REALM_NAME = 'reservation-realm'
+    const CLIENT_ID = 'reservation-client'
+    const CLIENT_SECRET = 'client-secret'
     const REDIRECT_URI = 'http://localhost:3000/callback'
     const LOGOUT_REDIRECT_URI = 'http://localhost:3000/'
 
     const users = [
         {
-            username: 'test1',
-            email: 'testuser1@example.com',
+            username: 'testuser',
+            email: 'testuser@example.com',
             firstName: 'Test',
             lastName: 'User',
-            password: 'password',
+            password: 'testpass',
         },
         {
-            username: 'test2',
-            email: 'testuser2@example.com',
+            username: 'testadmin',
+            email: 'testadmin@example.com',
             firstName: 'Test',
-            lastName: 'User',
-            password: 'password',
+            lastName: 'Admin',
+            password: 'testadminpass',
         },
     ]
 
