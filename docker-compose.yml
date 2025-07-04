@@ -1,5 +1,4 @@
 services:
-  # Infrastructure services
   db:
     image: postgres:15
     environment:
@@ -48,7 +47,6 @@ services:
       timeout: 10s
       retries: 3
 
-  # Application services
   api-rest:
     build:
       context: ./api-rest
