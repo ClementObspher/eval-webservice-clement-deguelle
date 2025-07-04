@@ -6,8 +6,7 @@ services:
       POSTGRES_PASSWORD: pgpass
       POSTGRES_DB: pgdb
     ports:
-      - '5432:5432'
-
+        - "5432:5432"
   keycloak:
     image: quay.io/keycloak/keycloak:latest
     command: start-dev
@@ -15,124 +14,17 @@ services:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
     ports:
-      - '8080:8080'
-
+    - "8080:8080"
   minio:
     image: minio/minio
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     ports:
-      - '9000:9000'
-      - '9090:9090'
+        - "9000:9000"
+        - "9090:9090"
     command:
-      - server
-      - /data
-      - --console-address
-      - ':9090'
-
-  api-rest:
-    build: ./api-rest
-    environment:
-      - DB_HOST=db
-      - DB_NAME=pgdb
-      - DB_USER=pguser
-      - DB_PASS=pgpass
-      - DB_PORT=5432
-      - KEYCLOAK_URL=http://keycloak:8080
-      - KEYCLOAK_REALM=reservation-realm
-      - MINIO_ENDPOINT=minio
-      - MINIO_PORT=9000
-      - MINIO_ACCESS_KEY=minioadmin
-      - MINIO_SECRET_KEY=minioadmin
-    ports:
-      - '3000:3000'
-
-  api-graphql:
-    build: ./api-graphql
-    environment:
-      - DB_HOST=db
-      - DB_NAME=pgdb
-      - DB_USER=pguser
-      - DB_PASS=pgpass
-      - DB_PORT=5432
-      - KEYCLOAK_URL=http://keycloak:8080
-      - KEYCLOAK_REALM=reservation-realm
-    ports:
-      - '3001:3000'
-
-  grpc-service:
-    build: ./grpc-service
-    environment:
-      - DB_HOST=db
-      - DB_NAME=pgdb
-      - DB_USER=pguser
-      - DB_PASS=pgpass
-      - DB_PORT=5432
-      - MINIO_ENDPOINT=minio
-      - MINIO_PORT=9000
-      - MINIO_ACCESS_KEY=minioadmin
-      - MINIO_SECRET_KEY=minioadmin
-    ports:
-      - '50051:50051'
-
-  test-api-rest:
-    build:
-      context: .
-      dockerfile: api-rest/Dockerfile
-    environment:
-      - API_REST_URL=http://api-rest:3000
-      - DB_HOST=db
-      - DB_NAME=pgdb
-      - DB_USER=pguser
-      - DB_PASS=pgpass
-      - DB_PORT=5432
-      - KEYCLOAK_URL=http://keycloak:8080
-      - KEYCLOAK_REALM=reservation-realm
-      - KEYCLOAK_CLIENT_ID=myclient
-      - KEYCLOAK_CLIENT_SECRET=mysecret
-      - KEYCLOAK_TEST_USR_USERNAME=test1
-      - KEYCLOAK_TEST_USR_PASSWORD=password
-      - KEYCLOAK_TEST_ADM_USERNAME=test2
-      - KEYCLOAK_TEST_ADM_PASSWORD=password
-      - KEYCLOAK_ADMIN_USERNAME=admin
-      - KEYCLOAK_ADMIN_PASSWORD=admin
-
-  test-api-graphql:
-    build:
-      context: .
-      dockerfile: api-graphql/Dockerfile
-    environment:
-      - API_GRAPHQL_URL=http://api-graphql:3000/graphql
-      - DB_HOST=db
-      - DB_NAME=pgdb
-      - DB_USER=pguser
-      - DB_PASS=pgpass
-      - DB_PORT=5432
-      - KEYCLOAK_URL=http://keycloak:8080
-      - KEYCLOAK_REALM=reservation-realm
-      - KEYCLOAK_CLIENT_ID=myclient
-      - KEYCLOAK_CLIENT_SECRET=mysecret
-      - KEYCLOAK_TEST_USR_USERNAME=test1
-      - KEYCLOAK_TEST_USR_PASSWORD=password
-      - KEYCLOAK_TEST_ADM_USERNAME=test2
-      - KEYCLOAK_TEST_ADM_PASSWORD=password
-      - KEYCLOAK_ADMIN_USERNAME=admin
-      - KEYCLOAK_ADMIN_PASSWORD=admin
-
-  test-grpc-service:
-    build:
-      context: .
-      dockerfile: grpc-service/Dockerfile
-    environment:
-      - PROTO_PATH=../grpc-service/src/proto/service.proto
-      - PROTO_URL=grpc-service:50051
-      - DB_HOST=db
-      - DB_NAME=pgdb
-      - DB_USER=pguser
-      - DB_PASS=pgpass
-      - DB_PORT=5432
-      - MINIO_ENDPOINT=minio
-      - MINIO_PORT=9000
-      - MINIO_ACCESS_KEY=minioadmin
-      - MINIO_SECRET_KEY=minioadmin
+    - server
+    - /data
+    - --console-address
+    - ":9090"
