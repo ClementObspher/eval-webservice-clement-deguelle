@@ -1,4 +1,5 @@
 services:
+  # Infrastructure services
   db:
     image: postgres:15
     environment:
@@ -6,7 +7,15 @@ services:
       POSTGRES_PASSWORD: pgpass
       POSTGRES_DB: pgdb
     ports:
-        - "5432:5432"
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pguser -d pgdb"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
   keycloak:
     image: quay.io/keycloak/keycloak:latest
     command: start-dev
@@ -14,17 +23,103 @@ services:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
     ports:
-    - "8080:8080"
+      - "8080:8080"
+    depends_on:
+      - db
+
   minio:
     image: minio/minio
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     ports:
-        - "9000:9000"
-        - "9090:9090"
+      - "9000:9000"
+      - "9090:9090"
+    volumes:
+      - minio_data:/data
     command:
-    - server
-    - /data
-    - --console-address
-    - ":9090"
+      - server
+      - /data
+      - --console-address
+      - ":9090"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Application services
+  api-rest:
+    build:
+      context: ./api-rest
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=pgdb
+      - DB_USER=pguser
+      - DB_PASS=pgpass
+      - KEYCLOAK_URL=http://keycloak:8080
+      - MINIO_ENDPOINT=minio
+      - MINIO_PORT=9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+      - GRPC_URL=grpc-service:50051
+    depends_on:
+      db:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+      minio:
+        condition: service_healthy
+      grpc-service:
+        condition: service_started
+
+  api-graphql:
+    build:
+      context: ./api-graphql
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=pgdb
+      - DB_USER=pguser
+      - DB_PASS=pgpass
+      - KEYCLOAK_URL=http://keycloak:8080
+    depends_on:
+      db:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+
+  grpc-service:
+    build:
+      context: ./grpc-service
+      dockerfile: Dockerfile
+    ports:
+      - "50051:50051"
+    environment:
+      - GRPC_URL=0.0.0.0:50051
+      - DB_HOST=db
+      - DB_PORT=5432
+      - DB_NAME=pgdb
+      - DB_USER=pguser
+      - DB_PASS=pgpass
+      - MINIO_ENDPOINT=minio
+      - MINIO_PORT=9000
+      - MINIO_ACCESS_KEY=minioadmin
+      - MINIO_SECRET_KEY=minioadmin
+    depends_on:
+      db:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  minio_data:
