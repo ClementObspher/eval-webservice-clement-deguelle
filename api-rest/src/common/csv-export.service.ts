@@ -1,15 +1,29 @@
 import { Injectable } from '@nestjs/common'
 import { MinioService } from './miniio.service'
 import { stringify } from 'csv-stringify/sync'
+import { Client } from 'minio'
 
 @Injectable()
 export class CsvExportService {
-    constructor(private readonly minioService: MinioService) {}
+    private minioClient: Client
+    constructor(private readonly minioService: MinioService) {
+        this.minioClient = new Client({
+            endPoint: process.env.MINIO_ENDPOINT || 'localhost',
+            port: parseInt(process.env.MINIO_PORT || '9000'),
+            useSSL: process.env.MINIO_USE_SSL === 'true',
+            accessKey: process.env.MINIO_ACCESS_KEY || 'minioadmin',
+            secretKey: process.env.MINIO_SECRET_KEY || 'minioadmin',
+        })
+    }
 
     async generateCsvAndUpload(email: string, reservations: any[]): Promise<string> {
         const timestamp = new Date().getTime()
         const fileName = `reservations-${email}-${timestamp}.csv`
         const bucketName = 'csv-exports'
+        const bucketExists = await this.minioClient.bucketExists(bucketName)
+        if (!bucketExists) {
+            await this.minioClient.makeBucket(bucketName)
+        }
 
         // Générer le CSV (format Buffer)
         const records = reservations.map((r) => ({
