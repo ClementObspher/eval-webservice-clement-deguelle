@@ -2,6 +2,9 @@
 const request = require('supertest');
 const jwksClient = require('jwks-rsa');
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
+
+console.log('KEYCLOAK_URL =', process.env.KEYCLOAK_URL);
 
 let keycloakUsrAccessToken = '';
 let keycloakAdmAccessToken = '';
@@ -40,10 +43,12 @@ async function getKeycloakAdmToken() {
     .send({
       grant_type: 'password',
       client_id: process.env.KEYCLOAK_CLIENT_ID,
-      client_secret: process.env.KEYCLOAK_CLIENT_SECRET, // si le client est en mode "confidential"
-      username: process.env.KEYCLOAK_TEST_ADM_USERNAME,
-      password: process.env.KEYCLOAK_TEST_ADM_PASSWORD,
+      client_secret: process.env.KEYCLOAK_CLIENT_SECRET,
+      username: process.env.KEYCLOAK_TEST_USR_USERNAME,
+      password: process.env.KEYCLOAK_TEST_USR_PASSWORD,
     });
+
+    console.log('ACCESS TOKEN :', res.body.access_token);
 
   if (res.status !== 200) {
     throw new Error(`Impossible de récupérer le token Keycloak: ${res.text}`);
