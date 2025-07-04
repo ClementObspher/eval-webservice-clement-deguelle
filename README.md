@@ -53,6 +53,12 @@ cd api-rest
 node init-keycloak.js
 ```
 
+Si Keycloak est configuré en mode SSL uniquement, re-exécutez le script :
+
+```bash
+./script.sh
+```
+
 Ce script configure :
 - Un realm `reservation-realm`
 - Un client `myclient` avec le secret `mysecret`
@@ -171,3 +177,12 @@ DB_NAME=pgdb
 ```
 
 Et importer le dossier proto (./grpc-service/src/proto/service.proto) à la racine de votre repo
+
+# Résultat des tests
+
+![alt text](./image.png)
+
+![alt text](./image_copy.png)
+
+
+
